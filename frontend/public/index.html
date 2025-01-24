@@ -9,6 +9,7 @@
       name="description"
       content="Web site created using create-react-app"
     />
+    <link rel="stylesheet" href="../src/App.css">
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -29,6 +30,41 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
+    <section>
+      <h1>Agregar producto</h1>
+
+      <form action="procesar_producto.php" method="POST">
+
+        <!-- Campo nombre -->
+        <label for="nombre">Nombre del producto :</label>
+        <input type="text" id="nombre" name="nombre" required minlength="3" maxlength="50" placeholder="Ingrese nombre de producto">
+
+        <!-- Precio -->
+          <label for="precio">Precio :</label>
+          <input type="number" name="precio" id="precio" required min="0.01" step="0.01" placeholder="Ingrese precio">
+
+          <!-- Botón de enviar -->
+          <button type="submit">Agregar producto</button>
+      </form>
+    </section>
+    
+    <section>
+      <h2>Lista de productos agregados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre de producto</th>
+            <th>Precio</th>
+            <th>Fecha de creación</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          
+        </tbody>
+      </table>
+    </section>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -39,5 +75,59 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      // Obtenemos la tabla y el formulario
+      const form = document.getElementById("productForm");
+      const productTable = document.getElementById("productTable").getElementsByTagName('tbody')[0];
+
+      // Manejar el envío del formulario
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const nombre = document.getElementById("nombre").value;
+        const precio = document.getElementById("precio").value;
+
+        // Enviar los datos al backend (procesar_producto.php)
+        const response = await fetch('procesar_producto.php', {
+          method: 'POST',
+          body: new URLSearchParams({
+            'nombre': nombre,
+            'precio': precio
+          }),
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+
+        const result = await response.text();
+        console.log(result); // Verifica el mensaje de éxito
+
+        // Limpiar los campos del formulario
+        form.reset();
+
+        // Actualizar la lista de productos
+        loadProducts();
+      });
+
+      // Cargar productos desde la base de datos
+      async function loadProducts() {
+        const response = await fetch('procesar_producto.php');
+        const products = await response.json(); // Asegúrate de que el backend devuelva un JSON
+
+        // Limpiar la tabla antes de agregar los productos
+        productTable.innerHTML = '';
+
+        // Mostrar los productos
+        products.forEach(product => {
+          const row = productTable.insertRow();
+          row.insertCell(0).textContent = product.nombre;
+          row.insertCell(1).textContent = product.precio;
+          row.insertCell(2).textContent = product.created_at;
+        });
+      }
+
+      // Cargar los productos al cargar la página
+      window.onload = loadProducts;
+    </script>
   </body>
 </html>
