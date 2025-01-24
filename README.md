@@ -18,7 +18,7 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
 
 2. **Corre los siguientes comandos**:
 
-composer install
-php artisan serve
+- composer install
+- php artisan serve
 
 
