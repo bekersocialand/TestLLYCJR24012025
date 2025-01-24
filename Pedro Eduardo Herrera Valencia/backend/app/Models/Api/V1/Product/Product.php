@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use SoftDeletes;
-    
+
     protected $appends = ['hash_id'];
 
     protected $fillable = [
@@ -19,11 +19,6 @@ class Product extends Model
     public function getHashIdAttribute(): string
     {
         return encrypt($this->id);
-    }
-
-    public function resolveRouteBinding($value, $field = null): Model|Product|null
-    {
-        return $this->where($field ?? 'id', decrypt($value))->firstOrFail();
     }
 
 }
